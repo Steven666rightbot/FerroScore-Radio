@@ -1,0 +1,66 @@
+# Git ignore for FerroScore-Radio project
+
+# Data files (too large for git)
+data/raw/*.gz
+data/raw/*.tsv
+data/raw/*.txt
+data/raw/tcga_*
+data/raw/gtex_*
+data/processed/*.csv
+!data/processed/.gitkeep
+
+# Results (generated files)
+results/figures/*.png
+results/figures/*.pdf
+results/tables/*.csv
+!results/figures/.gitkeep
+!results/tables/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# R
+.Rhistory
+.RData
+.Rproj.user/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Large files
+*.tar.gz
+*.zip
+*.rar
