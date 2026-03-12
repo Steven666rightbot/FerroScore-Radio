@@ -1,118 +1,129 @@
 #!/usr/bin/env python3
 """
-Download and process IMvigor210 dataset
+Download IMvigor210 dataset
 Urothelial carcinoma anti-PD-L1 (Atezolizumab)
 """
 
 import os
-import pandas as pd
 import requests
-from tqdm import tqdm
 
 EXTERNAL_DIR = '../data/external'
 os.makedirs(EXTERNAL_DIR, exist_ok=True)
 
 print("=" * 60)
-print("IMvigor210 Dataset Download")
+print("Downloading IMvigor210 Dataset")
 print("=" * 60)
 
 print("""
 IMvigor210 is a Phase 2 study of Atezolizumab in urothelial carcinoma.
-Dataset includes:
 - 348 patients
 - RNA-seq expression data
 - Response labels (CR, PR, SD, PD)
 - Survival data
 
 Download options:
-1. R package: IMvigor210CoreBiologies
-   install.packages('BiocManager')
-   BiocManager::install('IMvigor210CoreBiologies')
-
-2. Web portal: https://research-pub.gene.com/IMvigor210CoreBiologies/
-
-3. Direct download (if available):
+1. R package: IMvigor210CoreBiologies (recommended)
+2. cBioPortal: http://www.cbioportal.org/study?id=blca_iatlas_imvigor210_2017
+3. EGA: https://ega-archive.org/dacs/EGAC00001001611
 """)
 
-# Try to download from known URLs
-urls_to_try = [
-    "https://research-pub.gene.com/IMvigor210CoreBiologies/data/IMvigor210.csv",
-]
+# Try to download from cBioPortal
+print("\n1. Attempting download from cBioPortal...")
 
-print("Attempting download...")
-for url in urls_to_try:
-    print(f"  Trying: {url}")
-    try:
-        response = requests.get(url, timeout=30)
-        if response.status_code == 200:
-            output_file = f'{EXTERNAL_DIR}/IMvigor210.csv'
-            with open(output_file, 'wb') as f:
-                f.write(response.content)
-            print(f"  [OK] Downloaded: {output_file}")
-            break
-        else:
-            print(f"  Status: {response.status_code}")
-    except Exception as e:
-        print(f"  Error: {e}")
+# cBioPortal data hub URL
+# Note: cBioPortal requires clicking through UI, but has API
+# For now, provide manual download instructions
 
-# Create instructions file
-instructions = """
-# IMvigor210 Dataset Download Instructions
+print("""
+   cBioPortal requires manual download:
+   
+   Steps:
+   1. Visit: http://www.cbioportal.org/study?id=blca_iatlas_imvigor210_2017
+   2. Click "Download" tab
+   3. Download:
+      - data_mrna_seq_v2_rsem.txt (expression)
+      - data_clinical_sample.txt (sample info)
+      - data_clinical_patient.txt (patient info)
+   4. Save to: data/external/imvigor210/
+""")
 
-## Option 1: R Package (Recommended)
+# Try R package installation script
+print("\n2. Creating R script for IMvigor210CoreBiologies...")
 
-```r
-# Install BiocManager if not already installed
+r_script = """# IMvigor210 Download Script
+# Run this in R
+
+# Install BiocManager if needed
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 
 # Install IMvigor210CoreBiologies
 BiocManager::install("IMvigor210CoreBiologies")
 
-# Load and extract data
+# Load package
 library(IMvigor210CoreBiologies)
+
+# Load data
 data(cds)
 
-# Extract expression matrix
-expr_matrix = counts(cds)
+# Extract expression matrix (TPM)
+expr_matrix = counts(cds, normalized=TRUE)
 write.csv(expr_matrix, "IMvigor210_expression.csv")
 
 # Extract phenotype data
 pheno_data = pData(cds)
 write.csv(pheno_data, "IMvigor210_phenotype.csv")
-```
 
-## Option 2: Manual Download
+# Extract feature data (gene info)
+feature_data = fData(cds)
+write.csv(feature_data, "IMvigor210_genes.csv")
 
-1. Visit: https://research-pub.gene.com/IMvigor210CoreBiologies/
-2. Download the dataset
-3. Place files in: data/external/
-
-## Dataset Information
-
-- **Study**: IMvigor210 Phase 2
-- **Cancer**: Urothelial carcinoma (BLCA)
-- **Treatment**: Atezolizumab (anti-PD-L1)
-- **Samples**: 348 patients
-- **Data types**: RNA-seq, clinical, response, survival
-
-## Response Definitions
-
-- CR: Complete Response
-- PR: Partial Response  
-- SD: Stable Disease
-- PD: Progressive Disease
-
-## Use in FerroScore-Immuno
-
-This dataset can be used as:
-1. External validation cohort
-2. Training data for immunotherapy-specific model
-3. Benchmark for performance comparison
+print("Download complete!")
+print(paste("Samples:", ncol(expr_matrix)))
+print(paste("Genes:", nrow(expr_matrix)))
 """
 
-with open(f'{EXTERNAL_DIR}/IMvigor210_instructions.md', 'w') as f:
-    f.write(instructions)
+r_script_path = f'{EXTERNAL_DIR}/download_imvigor210.R'
+with open(r_script_path, 'w') as f:
+    f.write(r_script)
 
-print(f"\n[OK] Saved: IMvigor210_instructions.md")
-print("\nPlease follow the instructions to download the dataset.")
+print(f"   [OK] Created: {r_script_path}")
+print("\n   Run this script in R to download IMvigor210")
+
+# Alternative: Try to find direct download links
+print("\n3. Checking for direct download links...")
+
+# Try to download from known academic mirrors
+urls_to_try = [
+    "https://raw.githubusercontent.com/cran/IMvigor210CoreBiologies/master/data/cds.rda",
+]
+
+for url in urls_to_try:
+    print(f"   Trying: {url}")
+    try:
+        response = requests.head(url, timeout=10)
+        print(f"   Status: {response.status_code}")
+    except Exception as e:
+        print(f"   Error: {e}")
+
+print("\n" + "=" * 60)
+print("Summary")
+print("=" * 60)
+print("""
+To get IMvigor210 data:
+
+Option 1 (Recommended): Use R script
+   Run: Rscript download_imvigor210.R
+   
+Option 2: Manual download from cBioPortal
+   Visit: http://www.cbioportal.org/study?id=blca_iatlas_imvigor210_2017
+   Download expression and clinical data
+
+Option 3: EGA (requires application)
+   https://ega-archive.org/dacs/EGAC00001001611
+
+Expected files:
+- IMvigor210_expression.csv (RNA-seq TPM)
+- IMvigor210_phenotype.csv (sample info + response)
+- ~348 samples
+""")
