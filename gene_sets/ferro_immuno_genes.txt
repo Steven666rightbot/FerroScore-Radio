@@ -1,0 +1,99 @@
+# FerroScore-Immuno Gene Set
+# Created: 2026-03-12
+# Description: Ferroptosis and Immunotherapy Response Related Genes
+
+## 1. Ferroptosis Driver Genes (促进铁死亡)
+ACSL4
+LPCAT3
+ALOX15
+ALOX5
+NOX1
+NOX4
+P53
+SAT1
+CARS1
+
+## 2. Ferroptosis Suppressor Genes (抑制铁死亡)
+GPX4
+SLC7A11
+SLC3A2
+NFE2L2
+HMOX1
+FTH1
+FTL
+SOD1
+SOD2
+GCLC
+GCLM
+MT1G
+MT1H
+MT1M
+
+## 3. Ferroptosis Marker Genes (标志物)
+PTGS2
+CHAC1
+ACSL4
+
+## 4. Antigen Presentation Genes - 抗原呈递
+HLA-A
+HLA-B
+HLA-C
+HLA-E
+HLA-DRA
+HLA-DRB1
+HLA-DQA1
+HLA-DQB1
+HLA-DPA1
+HLA-DPB1
+B2M
+TAP1
+TAP2
+
+## 5. T Cell Infiltration Markers - T细胞浸润
+CD3D
+CD3E
+CD4
+CD8A
+CD8B
+CXCL9
+CXCL10
+CXCL11
+CCL5
+CCR5
+CXCR3
+GZMA
+GZMB
+PRF1
+
+## 6. Immune Checkpoint Genes - 免疫检查点
+PDCD1
+CD274
+PDCD1LG2
+CTLA4
+HAVCR2
+LAG3
+TIGIT
+CD276
+
+## 7. Tumor Microenvironment - 肿瘤微环境
+TGFB1
+TGFBR1
+TGFBR2
+VEGFA
+VEGFB
+ANGPT2
+COL1A1
+COL3A1
+ACTA2
+FAP
+
+## 8. Inflammatory Cytokines - 炎症因子
+IFNG
+IL2
+IL6
+IL10
+IL12A
+TNF
+
+## Total Genes: ~85 genes
+## Note: Need to remove duplicates and validate in expression data

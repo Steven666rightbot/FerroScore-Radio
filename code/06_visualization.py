@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Step 6: Visualization - Generate Publication-Quality Figures
-Create article-level figures for FerroScore-Radio manuscript
+Create article-level figures for FerroScore-Immuno manuscript
 """
 
 import os
@@ -35,7 +35,7 @@ def load_all_results():
     data = {}
     
     # Load scores
-    scores_file = f'{RESULTS_DIR}/tables/ferro_radio_scores.csv'
+    scores_file = f'{RESULTS_DIR}/tables/ferro_immuno_scores.csv'
     if os.path.exists(scores_file):
         data['scores'] = pd.read_csv(scores_file, index_col=0)
     

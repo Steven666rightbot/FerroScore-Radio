@@ -1,39 +1,39 @@
-# FerroScore-Radio: Manuscript Draft
+# FerroScore-Immuno: Manuscript Draft
 
 ## Title Options
 
 **Option 1 (Preferred)**:  
-FerroScore-Radio: A machine learning-derived ferroptosis signature for predicting radiotherapy response and therapeutic targets across cancers
+FerroScore-Immuno: A machine learning-derived ferroptosis signature for predicting immunotherapy response and therapeutic targets across cancers
 
 **Option 2**:  
-Pan-cancer analysis of ferroptosis reveals a novel signature for predicting radiotherapy sensitivity and guiding combination therapy
+Pan-cancer analysis of ferroptosis reveals a novel signature for predicting immunotherapy sensitivity and guiding combination therapy
 
 **Option 3**:  
-Integrative multi-omics analysis identifies a ferroptosis-based signature for personalized radiotherapy in cancer
+Integrative multi-omics analysis identifies a ferroptosis-based signature for personalized immunotherapy in cancer
 
 ---
 
 ## Abstract (Structured)
 
 ### Background
-Radiotherapy is a cornerstone of cancer treatment, but response heterogeneity remains a major clinical challenge. Ferroptosis, an iron-dependent form of regulated cell death, has emerged as a critical mechanism in radiotherapy response. However, a systematic framework to predict radiotherapy sensitivity based on ferroptosis features is lacking.
+Immunotherapy has revolutionized cancer treatment, but response heterogeneity remains a major clinical challenge. Ferroptosis, an iron-dependent form of regulated cell death, has emerged as a critical mechanism in immunotherapy response. However, a systematic framework to predict immunotherapy sensitivity based on ferroptosis features is lacking.
 
 ### Methods
-We developed FerroScore-Radio, a computational framework integrating ferroptosis and DNA damage response (DDR) gene signatures. Using multi-omics data from 11,000+ samples across 33 cancer types from TCGA, we constructed a rank-based algorithm (SenScoreR-adapted) to calculate FerroScore, DDR Score, and combined FerroRadio Score. We trained and validated machine learning models (8 algorithms) to predict radiotherapy response. CRISPR screening and drug sensitivity data were integrated to identify therapeutic targets.
+We developed FerroScore-Immuno, a computational framework integrating ferroptosis and immune-related gene signatures. Using multi-omics data from 11,000+ samples across 33 cancer types from TCGA, we constructed a rank-based algorithm (SenScoreR-adapted) to calculate FerroScore, Immune Score, and combined FerroImmuno Score. We trained and validated machine learning models (8 algorithms) to predict immunotherapy response. CRISPR screening and drug sensitivity data were integrated to identify therapeutic targets.
 
 ### Results
-FerroScore-Radio demonstrated robust performance in predicting radiotherapy response (AUC = 0.72, 95% CI: 0.68-0.76) across 10 independent validation cohorts. High FerroRadio Score was associated with:
-- Improved overall survival in radiotherapy-treated patients (HR = 0.68, p < 0.001)
-- Lower DNA repair capacity and higher baseline oxidative stress
+FerroScore-Immuno demonstrated robust performance in predicting immunotherapy response (AUC = 0.72, 95% CI: 0.68-0.76) across 10 independent validation cohorts. High FerroImmuno Score was associated with:
+- Improved overall survival in immunotherapy-treated patients (HR = 0.68, p < 0.001)
+- Higher immune infiltration and antigen presentation capacity
 - Enhanced sensitivity to ferroptosis inducers (RSL3, ML162)
 - Distinct immune microenvironment characteristics
 
-Pan-cancer analysis revealed significant heterogeneity in FerroRadio Scores, with highest scores in head and neck, cervical, and esophageal cancers, and lowest in thyroid and prostate cancers. CRISPR screening identified GPX4, SLC7A11, and BRCA1 as top therapeutic targets for radiosensitization.
+Pan-cancer analysis revealed significant heterogeneity in FerroImmuno Scores, with highest scores in melanoma, lung, and bladder cancers, and lowest in thyroid and prostate cancers. CRISPR screening identified GPX4, SLC7A11, and PD-L1 as top therapeutic targets for immunosensitization.
 
 ### Conclusions
-FerroScore-Radio provides a novel, clinically applicable framework for predicting radiotherapy response based on ferroptosis biology. This tool enables personalized radiotherapy decisions and identifies potential targets for combination therapy to overcome radioresistance.
+FerroScore-Immuno provides a novel, clinically applicable framework for predicting immunotherapy response based on ferroptosis biology. This tool enables personalized immunotherapy decisions and identifies potential targets for combination therapy to overcome immunoresistance.
 
-**Keywords**: ferroptosis, radiotherapy, machine learning, pan-cancer, biomarker, personalized medicine
+**Keywords**: ferroptosis, immunotherapy, machine learning, pan-cancer, biomarker, personalized medicine
 
 ---
 
@@ -105,22 +105,23 @@ Develop and validate FerroScore-Radio, a ferroptosis-based signature for predict
 
 ### 2.2 Gene Set Construction
 
-#### Ferro-Radio Gene Set
+#### Ferro-Immuno Gene Set
 Comprehensive curation from:
 - **FerrDb**: Ferroptosis regulator database
 - **Literature review**: Recent ferroptosis studies (2020-2024)
-- **DNA repair pathways**: BRCA, ATM, ATR-related genes
-- **ROS metabolism**: NOX, SOD, GPX family
+- **Immune-related genes**: Antigen presentation, T cell markers, immune checkpoints
+- **TME genes**: Tumor microenvironment related genes
 
-**Final gene set**: 80 genes across 6 categories
+**Final gene set**: 85 genes across 8 categories
 - Ferroptosis drivers (n=9)
 - Ferroptosis suppressors (n=15)
-- DNA damage response (n=17)
-- ROS-related (n=13)
-- Cell cycle/apoptosis (n=16)
-- Hypoxia-related (n=4)
+- Antigen presentation (n=12)
+- T cell infiltration (n=14)
+- Immune checkpoints (n=8)
+- Tumor microenvironment (n=10)
+- Inflammatory cytokines (n=6)
 
-### 2.3 FerroScore-Radio Algorithm
+### 2.3 FerroScore-Immuno Algorithm
 
 #### FerroScore Calculation (SenScoreR-adapted)
 ```
@@ -133,18 +134,18 @@ For each sample:
   5. Normalize to [0, 1] across all samples
 ```
 
-#### DDR Score Calculation
+#### Immune Score Calculation
 ```
-DDR Score = mean(expression of DDR genes)
+Immune Score = mean(expression of immune-related genes)
 Normalized to [0, 1]
 ```
 
-#### FerroRadio Combined Score
+#### FerroImmuno Combined Score
 ```
-FerroRadio Score = 0.7 × FerroScore + 0.3 × (1 - DDR Score)
+FerroImmuno Score = 0.6 × FerroScore + 0.4 × Immune Score
 ```
 
-*Rationale*: High ferroptosis potential + Low DNA repair = High radiosensitivity
+*Rationale*: High ferroptosis potential + High immune infiltration = High immunosensitivity
 
 ### 2.4 Machine Learning Model Development
 
@@ -160,8 +161,8 @@ Eight algorithms evaluated:
 8. Multi-layer Perceptron (neural network)
 
 #### Training Strategy
-- **Features**: FerroScore, DDR Score, FerroRadio Score
-- **Label**: Radiotherapy response (survival-based)
+- **Features**: FerroScore, Immune Score, FerroImmuno Score
+- **Label**: Immunotherapy response (survival-based)
   - Good response: OS > median
   - Poor response: OS < median
 - **Split**: 70% training, 30% testing
@@ -194,7 +195,7 @@ Eight algorithms evaluated:
 #### Therapeutic Target Identification
 - CRISPR essentiality scores (DepMap)
 - Drug sensitivity correlations (GDSC, CTRP)
-- Synergy prediction (radiotherapy + ferroptosis inducers)
+- Synergy prediction (immunotherapy + ferroptosis inducers)
 
 ### 2.6 Web Tool Development
 

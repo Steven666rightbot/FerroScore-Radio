@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Step 4: Machine Learning Model Training
-Train multiple ML models to predict radiotherapy response
+Train multiple ML models to predict immunotherapy response
 """
 
 import os
@@ -34,7 +34,7 @@ def load_data():
     print("Loading data...")
     
     # Load scores
-    scores_file = f'{RESULTS_DIR}/tables/ferro_radio_scores.csv'
+    scores_file = f'{RESULTS_DIR}/tables/ferro_immuno_scores.csv'
     if not os.path.exists(scores_file):
         print(f"✗ Scores file not found: {scores_file}")
         return None, None, None
@@ -66,28 +66,28 @@ def prepare_labels(clinical_df, survival_df=None):
     Prepare labels for training
     
     Strategy:
-    1. Patients with radiotherapy and good outcome (long survival) = Positive
-    2. Patients with radiotherapy and poor outcome (short survival) = Negative
+    1. Patients with immunotherapy and good outcome (long survival) = Positive
+    2. Patients with immunotherapy and poor outcome (short survival) = Negative
     3. Use median survival as cutoff
     """
     print("\nPreparing labels...")
     
-    # Filter patients with radiotherapy info
-    if 'received_radiotherapy' not in clinical_df.columns:
-        print("  ✗ No radiotherapy information")
+    # Filter patients with immunotherapy info
+    if 'received_immunotherapy' not in clinical_df.columns:
+        print("  ✗ No immunotherapy information")
         return None
     
-    rt_patients = clinical_df[clinical_df['received_radiotherapy'] == True].copy()
-    print(f"  Patients with radiotherapy: {len(rt_patients)}")
+    immuno_patients = clinical_df[clinical_df['received_immunotherapy'] == True].copy()
+    print(f"  Patients with immunotherapy: {len(immuno_patients)}")
     
-    if survival_df is None or len(rt_patients) == 0:
-        print("  Using FerroRadio score as proxy label")
-        # Use median FerroRadio score as cutoff
+    if survival_df is None or len(immuno_patients) == 0:
+        print("  Using FerroImmuno score as proxy label")
+        # Use median FerroImmuno score as cutoff
         return None
     
     # Merge survival data
     if 'sample' in survival_df.columns:
-        rt_patients = rt_patients.merge(
+        immuno_patients = immuno_patients.merge(
             survival_df[['sample', 'OS', 'OS.time']], 
             left_on='sample_id', 
             right_on='sample',
@@ -95,29 +95,29 @@ def prepare_labels(clinical_df, survival_df=None):
         )
     
     # Filter patients with survival data
-    rt_patients = rt_patients.dropna(subset=['OS.time'])
-    print(f"  Patients with survival data: {len(rt_patients)}")
+    immuno_patients = immuno_patients.dropna(subset=['OS.time'])
+    print(f"  Patients with survival data: {len(immuno_patients)}")
     
-    if len(rt_patients) < 50:
+    if len(immuno_patients) < 50:
         print("  Too few samples, using alternative labeling")
         return None
     
     # Define good vs poor outcome
-    median_survival = rt_patients['OS.time'].median()
-    rt_patients['label'] = (rt_patients['OS.time'] >= median_survival).astype(int)
+    median_survival = immuno_patients['OS.time'].median()
+    immuno_patients['label'] = (immuno_patients['OS.time'] >= median_survival).astype(int)
     
     print(f"  Median survival: {median_survival:.1f} days")
-    print(f"  Good outcome (label=1): {(rt_patients['label']==1).sum()}")
-    print(f"  Poor outcome (label=0): {(rt_patients['label']==0).sum()}")
+    print(f"  Good outcome (label=1): {(immuno_patients['label']==1).sum()}")
+    print(f"  Poor outcome (label=0): {(immuno_patients['label']==0).sum()}")
     
-    return rt_patients[['sample_id', 'label', 'OS', 'OS.time']]
+    return immuno_patients[['sample_id', 'label', 'OS', 'OS.time']]
 
 def prepare_features(scores_df, labels_df=None):
     """Prepare feature matrix"""
     print("\nPreparing features...")
     
-    # Use FerroScore, DDR_Score, FerroRadio_Score as features
-    feature_cols = ['FerroScore', 'DDR_Score', 'FerroRadio_Score']
+    # Use FerroScore, Immune_Score, FerroImmuno_Score as features
+    feature_cols = ['FerroScore', 'Immune_Score', 'FerroImmuno_Score']
     available_cols = [c for c in feature_cols if c in scores_df.columns]
     
     if len(available_cols) == 0:
@@ -126,11 +126,11 @@ def prepare_features(scores_df, labels_df=None):
     
     features = scores_df[available_cols].copy()
     
-    # If no labels, use FerroRadio score to create proxy labels
+    # If no labels, use FerroImmuno score to create proxy labels
     if labels_df is None:
-        print("  Creating proxy labels from FerroRadio score")
-        median_score = features['FerroRadio_Score'].median()
-        labels = (features['FerroRadio_Score'] >= median_score).astype(int)
+        print("  Creating proxy labels from FerroImmuno score")
+        median_score = features['FerroImmuno_Score'].median()
+        labels = (features['FerroImmuno_Score'] >= median_score).astype(int)
         labels.name = 'label'
     else:
         # Merge with labels

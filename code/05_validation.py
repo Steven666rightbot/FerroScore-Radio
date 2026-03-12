@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Step 5: Validation Analysis
-Survival analysis, radiotherapy-specific validation, and external validation
+Survival analysis, immunotherapy-specific validation, and external validation
 """
 
 import os
@@ -164,59 +164,59 @@ def survival_analysis(merged_df, score_col='FerroRadio_Score'):
     
     return results.p_value
 
-def radiotherapy_validation(merged_df):
+def immunotherapy_validation(merged_df):
     """
-    Validate specifically in radiotherapy patients
+    Validate specifically in immunotherapy patients
     """
     print("\n" + "=" * 60)
-    print("Radiotherapy-Specific Validation")
+    print("Immunotherapy-Specific Validation")
     print("=" * 60)
     
-    # Filter radiotherapy patients
-    if 'received_radiotherapy' not in merged_df.columns:
-        print("  ✗ No radiotherapy information")
+    # Filter immunotherapy patients
+    if 'received_immunotherapy' not in merged_df.columns:
+        print("  ✗ No immunotherapy information")
         return None
     
-    rt_patients = merged_df[merged_df['received_radiotherapy'] == True].copy()
-    print(f"  Patients with radiotherapy: {len(rt_patients)}")
+    immuno_patients = merged_df[merged_df['received_immunotherapy'] == True].copy()
+    print(f"  Patients with immunotherapy: {len(immuno_patients)}")
     
-    if len(rt_patients) < 50:
-        print("  ✗ Insufficient radiotherapy patients")
+    if len(immuno_patients) < 50:
+        print("  ✗ Insufficient immunotherapy patients")
         return None
     
     # Check survival data
-    rt_surv = rt_patients.dropna(subset=['OS.time', 'OS'])
-    print(f"  RT patients with survival: {len(rt_surv)}")
+    immuno_surv = immuno_patients.dropna(subset=['OS.time', 'OS'])
+    print(f"  Immuno patients with survival: {len(immuno_surv)}")
     
-    if len(rt_surv) < 30:
-        print("  ✗ Insufficient survival data for RT patients")
+    if len(immuno_surv) < 30:
+        print("  ✗ Insufficient survival data for immuno patients")
         return None
     
-    # Survival analysis in RT patients
-    rt_surv['OS_years'] = rt_surv['OS.time'] / 365.25
+    # Survival analysis in immuno patients
+    immuno_surv['OS_years'] = immuno_surv['OS.time'] / 365.25
     
-    # Stratify by FerroRadio score
-    median_score = rt_surv['FerroRadio_Score'].median()
-    rt_surv['score_group'] = (rt_surv['FerroRadio_Score'] >= median_score).astype(int)
+    # Stratify by FerroImmuno score
+    median_score = immuno_surv['FerroImmuno_Score'].median()
+    immuno_surv['score_group'] = (immuno_surv['FerroImmuno_Score'] >= median_score).astype(int)
     
     # KM analysis
     kmf_high = KaplanMeierFitter()
     kmf_low = KaplanMeierFitter()
     
-    high_mask = rt_surv['score_group'] == 1
-    low_mask = rt_surv['score_group'] == 0
+    high_mask = immuno_surv['score_group'] == 1
+    low_mask = immuno_surv['score_group'] == 0
     
-    kmf_high.fit(rt_surv.loc[high_mask, 'OS_years'], rt_surv.loc[high_mask, 'OS'], label='High FerroRadio')
-    kmf_low.fit(rt_surv.loc[low_mask, 'OS_years'], rt_surv.loc[low_mask, 'OS'], label='Low FerroRadio')
+    kmf_high.fit(immuno_surv.loc[high_mask, 'OS_years'], immuno_surv.loc[high_mask, 'OS'], label='High FerroImmuno')
+    kmf_low.fit(immuno_surv.loc[low_mask, 'OS_years'], immuno_surv.loc[low_mask, 'OS'], label='Low FerroImmuno')
     
     results = logrank_test(
-        rt_surv.loc[high_mask, 'OS_years'],
-        rt_surv.loc[low_mask, 'OS_years'],
-        rt_surv.loc[high_mask, 'OS'],
-        rt_surv.loc[low_mask, 'OS']
+        immuno_surv.loc[high_mask, 'OS_years'],
+        immuno_surv.loc[low_mask, 'OS_years'],
+        immuno_surv.loc[high_mask, 'OS'],
+        immuno_surv.loc[low_mask, 'OS']
     )
     
-    print(f"\n  RT patients - Log-rank p-value: {results.p_value:.4e}")
+    print(f"\n  Immuno patients - Log-rank p-value: {results.p_value:.4e}")
     
     # Plot
     fig, ax = plt.subplots(figsize=(10, 7))
@@ -225,28 +225,28 @@ def radiotherapy_validation(merged_df):
     
     ax.set_xlabel('Time (years)')
     ax.set_ylabel('Overall Survival Probability')
-    ax.set_title(f'Radiotherapy Patients: Survival by FerroRadio Score\n(p={results.p_value:.4e})')
+    ax.set_title(f'Immunotherapy Patients: Survival by FerroImmuno Score\n(p={results.p_value:.4e})')
     ax.legend(loc='lower left')
     ax.grid(True, alpha=0.3)
     
     plt.tight_layout()
-    plt.savefig(f'{RESULTS_DIR}/figures/km_radiotherapy_patients.png', dpi=300)
-    print(f"  ✓ Saved: km_radiotherapy_patients.png")
+    plt.savefig(f'{RESULTS_DIR}/figures/km_immunotherapy_patients.png', dpi=300)
+    print(f"  ✓ Saved: km_immunotherapy_patients.png")
     plt.close()
     
-    # Compare RT vs non-RT
-    non_rt = merged_df[merged_df['received_radiotherapy'] == False]
-    print(f"\n  Non-RT patients: {len(non_rt)}")
+    # Compare immuno vs non-immuno
+    non_immuno = merged_df[merged_df['received_immunotherapy'] == False]
+    print(f"\n  Non-immuno patients: {len(non_immuno)}")
     
-    if len(non_rt) > 50:
-        print(f"  Mean FerroRadio Score:")
-        print(f"    RT patients: {rt_patients['FerroRadio_Score'].mean():.3f}")
-        print(f"    Non-RT patients: {non_rt['FerroRadio_Score'].mean():.3f}")
+    if len(non_immuno) > 50:
+        print(f"  Mean FerroImmuno Score:")
+        print(f"    Immuno patients: {immuno_patients['FerroImmuno_Score'].mean():.3f}")
+        print(f"    Non-immuno patients: {non_immuno['FerroImmuno_Score'].mean():.3f}")
         
         # T-test
         t_stat, p_val = stats.ttest_ind(
-            rt_patients['FerroRadio_Score'].dropna(),
-            non_rt['FerroRadio_Score'].dropna()
+            immuno_patients['FerroImmuno_Score'].dropna(),
+            non_immuno['FerroImmuno_Score'].dropna()
         )
         print(f"    T-test p-value: {p_val:.4f}")
     
@@ -278,16 +278,16 @@ def cancer_type_analysis(merged_df):
     top_cancers = cancer_counts.head(15).index
     plot_data = merged_df[merged_df['cancer_type'].isin(top_cancers)]
     
-    sns.boxplot(data=plot_data, x='cancer_type', y='FerroRadio_Score', ax=axes[0])
+    sns.boxplot(data=plot_data, x='cancer_type', y='FerroImmuno_Score', ax=axes[0])
     axes[0].set_xticklabels(axes[0].get_xticklabels(), rotation=45, ha='right')
-    axes[0].set_title('FerroRadio Score Distribution by Cancer Type (Top 15)')
-    axes[0].set_ylabel('FerroRadio Score')
+    axes[0].set_title('FerroImmuno Score Distribution by Cancer Type (Top 15)')
+    axes[0].set_ylabel('FerroImmuno Score')
     
     # Mean score by cancer
-    mean_scores = merged_df.groupby('cancer_type')['FerroRadio_Score'].mean().sort_values(ascending=False)
+    mean_scores = merged_df.groupby('cancer_type')['FerroImmuno_Score'].mean().sort_values(ascending=False)
     mean_scores.head(20).plot(kind='bar', ax=axes[1], color='steelblue')
-    axes[1].set_title('Mean FerroRadio Score by Cancer Type (Top 20)')
-    axes[1].set_ylabel('Mean FerroRadio Score')
+    axes[1].set_title('Mean FerroImmuno Score by Cancer Type (Top 20)')
+    axes[1].set_ylabel('Mean FerroImmuno Score')
     axes[1].tick_params(axis='x', rotation=45)
     
     plt.tight_layout()
@@ -297,9 +297,9 @@ def cancer_type_analysis(merged_df):
     
     # Save summary
     summary = merged_df.groupby('cancer_type').agg({
-        'FerroRadio_Score': ['mean', 'std', 'count'],
+        'FerroImmuno_Score': ['mean', 'std', 'count'],
         'FerroScore': ['mean', 'std'],
-        'DDR_Score': ['mean', 'std']
+        'Immune_Score': ['mean', 'std']
     }).round(3)
     
     summary.to_csv(f'{RESULTS_DIR}/tables/cancer_type_summary.csv')
@@ -357,9 +357,9 @@ def prognostic_value_by_stage(merged_df):
         if len(stage_subset) < 30:
             continue
         
-        # Stratify by FerroRadio score
-        median_score = stage_subset['FerroRadio_Score'].median()
-        stage_subset['score_group'] = (stage_subset['FerroRadio_Score'] >= median_score).astype(int)
+        # Stratify by FerroImmuno score
+        median_score = stage_subset['FerroImmuno_Score'].median()
+        stage_subset['score_group'] = (stage_subset['FerroImmuno_Score'] >= median_score).astype(int)
         
         # Log-rank test
         high_mask = stage_subset['score_group'] == 1
@@ -395,7 +395,7 @@ def prognostic_value_by_stage(merged_df):
 def main():
     """Main validation function"""
     print("=" * 60)
-    print("FerroScore-Radio: Validation Analysis")
+    print("FerroScore-Immuno: Validation Analysis")
     print("=" * 60)
     
     # 1. Load data
@@ -405,12 +405,12 @@ def main():
     merged_df = merge_data(scores_df, clinical, survival)
     
     # 3. Overall survival analysis
-    p_val_os = survival_analysis(merged_df, 'FerroRadio_Score')
+    p_val_os = survival_analysis(merged_df, 'FerroImmuno_Score')
     p_val_ferro = survival_analysis(merged_df, 'FerroScore')
-    p_val_ddr = survival_analysis(merged_df, 'DDR_Score')
+    p_val_immune = survival_analysis(merged_df, 'Immune_Score')
     
-    # 4. Radiotherapy-specific validation
-    rt_pval = radiotherapy_validation(merged_df)
+    # 4. Immunotherapy-specific validation
+    immuno_pval = immunotherapy_validation(merged_df)
     
     # 5. Cancer type analysis
     cancer_scores = cancer_type_analysis(merged_df)
@@ -425,18 +425,18 @@ def main():
     
     summary = {
         'Analysis': [
-            'Overall Survival (FerroRadio)',
+            'Overall Survival (FerroImmuno)',
             'Overall Survival (FerroScore)',
-            'Overall Survival (DDR)',
-            'Radiotherapy Patients',
+            'Overall Survival (Immune)',
+            'Immunotherapy Patients',
             'Cancer Types Analyzed',
             'Stage-stratified'
         ],
         'P-value': [
             p_val_os if p_val_os else 'N/A',
             p_val_ferro if p_val_ferro else 'N/A',
-            p_val_ddr if p_val_ddr else 'N/A',
-            rt_pval if rt_pval else 'N/A',
+            p_val_immune if p_val_immune else 'N/A',
+            immuno_pval if immuno_pval else 'N/A',
             len(cancer_scores) if cancer_scores is not None else 'N/A',
             'Completed' if stage_results is not None else 'N/A'
         ]

@@ -1,22 +1,22 @@
-# FerroScore-Radio
+# FerroScore-Immuno
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **首个专门针对放疗反应的铁死亡评分系统**
+> **首个专门针对免疫治疗反应的铁死亡评分系统**
 > 
-> FerroScore-Radio: A machine learning-derived ferroptosis signature for predicting radiotherapy response across cancers
+> FerroScore-Immuno: A machine learning-derived ferroptosis signature for predicting immunotherapy response across cancers
 
 ## 🎯 核心创新
 
-1. **Ferro-Radio联合基因集**：铁死亡基因 + DNA修复基因 + ROS基因
-2. **放疗特异性预测**：专门预测放疗反应，而非一般预后
+1. **Ferro-Immuno联合基因集**：铁死亡基因 + 免疫相关基因 + TME基因
+2. **免疫治疗特异性预测**：专门预测免疫治疗反应，而非一般预后
 3. **泛癌种统一模型**：一个模型适用于多种癌症
-4. **联合用药指导**：预测放疗+铁死亡诱导剂的协同效应
+4. **联合用药指导**：预测免疫治疗+铁死亡诱导剂的协同效应
 
 ## 📊 工作流程
 
 ```
-TCGA/GTEx 数据 → 基因表达矩阵 → FerroScore算法 → 机器学习模型 → 放疗反应预测
+TCGA/GTEx 数据 → 基因表达矩阵 → FerroScore算法 → 机器学习模型 → 免疫治疗反应预测
      ↓                ↓               ↓              ↓              ↓
   数据下载        预处理          评分计算        模型训练        验证分析
 ```
@@ -69,25 +69,26 @@ FerroScore-Radio/
 └── manuscript/            # 手稿
 ```
 
-## 🧬 Ferro-Radio 基因集
+## 🧬 Ferro-Immuno 基因集
 
 | 类别 | 基因数 | 功能 |
 |------|--------|------|
 | 铁死亡 Driver | 9 | 促进铁死亡 |
 | 铁死亡 Suppressor | 15 | 抑制铁死亡 |
-| DNA修复 | 17 | 放疗响应 |
-| ROS相关 | 13 | 放疗诱导ROS |
-| 细胞周期/凋亡 | 16 | 放疗细胞效应 |
-| 缺氧相关 | 4 | 放疗抵抗 |
+| 抗原呈递 | 12 | MHC分子、抗原加工 |
+| T细胞浸润 | 14 | 趋化因子、T细胞标志物 |
+| 免疫检查点 | 8 | PD-1/PD-L1、CTLA-4等 |
+| 肿瘤微环境 | 10 | TME相关基因 |
+| 炎症因子 | 6 | 细胞因子、炎症信号 |
 
 **总计：约80个核心基因**
 
 ## 📈 预期结果
 
 - **FerroScore**: 铁死亡活性评分
-- **DDR Score**: DNA损伤修复评分  
-- **FerroRadio Score**: 综合放疗敏感性评分
-- **机器学习模型**: 预测放疗反应 (AUC目标 > 0.70)
+- **Immune Score**: 免疫浸润评分  
+- **FerroImmuno Score**: 综合免疫治疗敏感性评分
+- **机器学习模型**: 预测免疫治疗反应 (AUC目标 > 0.70)
 
 ## 📚 参考文献
 

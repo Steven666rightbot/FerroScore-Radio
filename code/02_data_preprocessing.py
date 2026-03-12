@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Step 2: Data Preprocessing for FerroScore-Radio (Real Data Version)
+Step 2: Data Preprocessing for FerroScore-Immuno (Real Data Version)
 Process real TCGA data from Xena
 """
 
@@ -15,8 +15,8 @@ PROC_DIR = '../data/processed'
 os.makedirs(PROC_DIR, exist_ok=True)
 
 def load_gene_sets():
-    """Load Ferro-Radio gene sets"""
-    gene_file = '../gene_sets/ferro_radio_genes.txt'
+    """Load Ferro-Immuno gene sets"""
+    gene_file = '../gene_sets/ferro_immuno_genes.txt'
     
     gene_sets = {}
     current_set = None
@@ -99,11 +99,11 @@ def preprocess_expression(expr_df, gene_list):
     expr_df = expr_df[~expr_df.index.duplicated(keep='first')]
     print(f"  After removing duplicates: {expr_df.shape}")
     
-    # Filter to Ferro-Radio genes
+    # Filter to Ferro-Immuno genes
     available_genes = [g for g in gene_list if g in expr_df.index]
     missing_genes = [g for g in gene_list if g not in expr_df.index]
     
-    print(f"  Available Ferro-Radio genes: {len(available_genes)}/{len(gene_list)}")
+    print(f"  Available Ferro-Immuno genes: {len(available_genes)}/{len(gene_list)}")
     if missing_genes:
         print(f"  Missing genes ({len(missing_genes)}): {missing_genes[:10]}...")
     
@@ -160,7 +160,7 @@ def load_clinical_data():
 def main():
     """Main preprocessing function"""
     print("=" * 60)
-    print("FerroScore-Radio: Data Preprocessing (Real Data)")
+    print("FerroScore-Immuno: Data Preprocessing (Real Data)")
     print("=" * 60)
     
     # 1. Load gene sets
@@ -179,8 +179,8 @@ def main():
         return
     
     # Save processed expression
-    tcga_processed.to_csv(f'{PROC_DIR}/tcga_ferro_radio_expression.csv')
-    print(f"  Saved: tcga_ferro_radio_expression.csv")
+    tcga_processed.to_csv(f'{PROC_DIR}/tcga_ferro_immuno_expression.csv')
+    print(f"  Saved: tcga_ferro_immuno_expression.csv")
     
     # 4. Load clinical data
     clinical = load_clinical_data()

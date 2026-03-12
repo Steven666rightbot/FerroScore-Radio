@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Step 1: Data Download for FerroScore-Radio
+Step 1: Data Download for FerroScore-Immuno
 Download TCGA and GTEx data from UCSC Xena
 """
 
