@@ -36,7 +36,7 @@ def load_data():
     # Load scores
     scores_file = f'{RESULTS_DIR}/tables/ferro_immuno_scores.csv'
     if not os.path.exists(scores_file):
-        print(f"✗ Scores file not found: {scores_file}")
+        print(f"[X] Scores file not found: {scores_file}")
         return None, None, None
     
     scores_df = pd.read_csv(scores_file, index_col=0)
@@ -45,7 +45,7 @@ def load_data():
     # Load clinical data
     clin_file = f'{PROC_DIR}/tcga_clinical.csv'
     if not os.path.exists(clin_file):
-        print(f"✗ Clinical file not found: {clin_file}")
+        print(f"[X] Clinical file not found: {clin_file}")
         return None, None, None
     
     clinical = pd.read_csv(clin_file)
@@ -188,7 +188,14 @@ def train_models(X_train, X_test, y_train, y_test):
             
             # Predict
             y_pred = model.predict(X_test_scaled)
-            y_prob = model.predict_proba(X_test_scaled)[:, 1]
+            
+            # Get probabilities (some models don't have predict_proba)
+            if hasattr(model, 'predict_proba'):
+                y_prob = model.predict_proba(X_test_scaled)[:, 1]
+            elif hasattr(model, 'decision_function'):
+                y_prob = model.decision_function(X_test_scaled)
+            else:
+                y_prob = y_pred.astype(float)
             
             # Evaluate
             auc = roc_auc_score(y_test, y_prob)
@@ -210,7 +217,7 @@ def train_models(X_train, X_test, y_train, y_test):
             print(f"  AUC: {auc:.3f}, Acc: {acc:.3f}, F1: {f1:.3f}")
             
         except Exception as e:
-            print(f"  ✗ Error: {e}")
+            print(f"  [ERR] Error: {e}")
             continue
     
     # Save scaler
@@ -266,7 +273,7 @@ def plot_results(results_dict, trained_models, X_test, y_test, scaler):
     
     plt.tight_layout()
     plt.savefig(f'{RESULTS_DIR}/figures/model_comparison.png', dpi=300)
-    print("  ✓ Saved: model_comparison.png")
+    print("  [OK] Saved: model_comparison.png")
     plt.close()
     
     # 2. ROC curves
@@ -275,7 +282,12 @@ def plot_results(results_dict, trained_models, X_test, y_test, scaler):
     X_test_scaled = scaler.transform(X_test)
     
     for name, model in trained_models.items():
-        y_prob = model.predict_proba(X_test_scaled)[:, 1]
+        if hasattr(model, 'predict_proba'):
+            y_prob = model.predict_proba(X_test_scaled)[:, 1]
+        elif hasattr(model, 'decision_function'):
+            y_prob = model.decision_function(X_test_scaled)
+        else:
+            continue
         fpr, tpr, _ = roc_curve(y_test, y_prob)
         auc = roc_auc_score(y_test, y_prob)
         ax.plot(fpr, tpr, label=f'{name} (AUC={auc:.3f})')
@@ -288,7 +300,7 @@ def plot_results(results_dict, trained_models, X_test, y_test, scaler):
     ax.grid(True, alpha=0.3)
     
     plt.savefig(f'{RESULTS_DIR}/figures/roc_curves.png', dpi=300)
-    print("  ✓ Saved: roc_curves.png")
+    print("  [OK] Saved: roc_curves.png")
     plt.close()
 
 def save_best_model(trained_models, results_dict, X_train, y_train, scaler):
@@ -314,21 +326,21 @@ def save_best_model(trained_models, results_dict, X_train, y_train, scaler):
         'model': best_model,
         'model_name': best_model_name,
         'scaler': scaler,
-        'features': ['FerroScore', 'DDR_Score', 'FerroRadio_Score']
+        'features': ['FerroScore', 'Immune_Score', 'FerroImmuno_Score']
     }, model_path)
-    print(f"  ✓ Saved: {model_path}")
+    print(f"  [OK] Saved: {model_path}")
     
     # Save results
     results_df = pd.DataFrame(results_dict).T
     results_df.to_csv(f'{RESULTS_DIR}/tables/model_performance.csv')
-    print(f"  ✓ Saved: model_performance.csv")
+    print(f"  [OK] Saved: model_performance.csv")
     
     return best_model_name, best_auc
 
 def main():
     """Main training function"""
     print("=" * 60)
-    print("FerroScore-Radio: Machine Learning Model Training")
+    print("FerroScore-Immuno: Machine Learning Model Training")
     print("=" * 60)
     
     # 1. Load data

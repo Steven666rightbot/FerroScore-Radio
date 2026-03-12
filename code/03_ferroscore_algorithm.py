@@ -26,11 +26,16 @@ def load_gene_sets():
     gene_sets = {}
     current_set = None
     
-    with open(gene_file, 'r') as f:
+    with open(gene_file, 'r', encoding='utf-8') as f:
         for line in f:
             line = line.strip()
-            if line.startswith('## '):
-                current_set = line.replace('## ', '').split('(')[0].strip()
+            if line.startswith('##'):
+                # Extract category name (remove ## and number prefix)
+                current_set = line.split('(', 1)[0].strip()
+                current_set = current_set.replace('## ', '').replace('##', '').strip()
+                # Remove leading numbers like "1. "
+                if '. ' in current_set:
+                    current_set = current_set.split('. ', 1)[1]
                 gene_sets[current_set] = []
             elif line and not line.startswith('#') and current_set:
                 gene_sets[current_set].append(line)
@@ -182,7 +187,7 @@ def visualize_scores(scores_df, cancer_types=None):
     
     plt.tight_layout()
     plt.savefig(f'{RESULTS_DIR}/figures/score_distributions.png', dpi=300)
-    print(f"  ✓ Saved: score_distributions.png")
+    print(f"  [OK] Saved: score_distributions.png")
     plt.close()
     
     # If cancer types provided, plot by cancer
@@ -196,7 +201,7 @@ def visualize_scores(scores_df, cancer_types=None):
         plt.suptitle('')
         plt.tight_layout()
         plt.savefig(f'{RESULTS_DIR}/figures/score_by_cancer.png', dpi=300)
-        print(f"  ✓ Saved: score_by_cancer.png")
+        print(f"  [OK] Saved: score_by_cancer.png")
         plt.close()
 
 def main():
@@ -221,7 +226,7 @@ def main():
     # 2. Load expression data
     expr_file = f'{PROC_DIR}/tcga_ferro_immuno_expression.csv'
     if not os.path.exists(expr_file):
-        print(f"\n✗ Expression file not found: {expr_file}")
+        print(f"\n[X] Expression file not found: {expr_file}")
         print("  Please run 02_data_preprocessing.py first")
         return
     
@@ -253,8 +258,8 @@ def main():
         scores_df['cancer_type'] = scores_df.index.map(clinical_dict)
     
     # 8. Save results
-    scores_df.to_csv(f'{RESULTS_DIR}/tables/ferro_radio_scores.csv')
-    print(f"\n✓ Saved: ferro_radio_scores.csv")
+    scores_df.to_csv(f'{RESULTS_DIR}/tables/ferro_immuno_scores.csv')
+    print(f"\n[OK] Saved: ferro_immuno_scores.csv")
     
     # 9. Visualize
     visualize_scores(scores_df, scores_df.get('cancer_type'))
@@ -262,7 +267,7 @@ def main():
     print("\n" + "=" * 60)
     print("FerroScore Calculation Complete!")
     print("=" * 60)
-    print(f"\nResults saved to: {RESULTS_DIR}/tables/ferro_radio_scores.csv")
+    print(f"\nResults saved to: {RESULTS_DIR}/tables/ferro_immuno_scores.csv")
     print("\nNext step: Run 04_model_training.py")
 
 if __name__ == "__main__":

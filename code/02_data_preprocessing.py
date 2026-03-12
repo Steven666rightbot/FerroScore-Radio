@@ -25,7 +25,12 @@ def load_gene_sets():
         for line in f:
             line = line.strip()
             if line.startswith('##'):
-                current_set = line.replace('## ', '').split('(')[0].strip()
+                # Extract category name (remove ## and number prefix)
+                current_set = line.split('(', 1)[0].strip()
+                current_set = current_set.replace('## ', '').replace('##', '').strip()
+                # Remove leading numbers like "1. "
+                if '. ' in current_set:
+                    current_set = current_set.split('. ', 1)[1]
                 gene_sets[current_set] = []
             elif line and not line.startswith('#') and current_set:
                 gene_sets[current_set].append(line)

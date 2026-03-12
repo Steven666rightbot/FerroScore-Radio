@@ -2,7 +2,7 @@
 # Created: 2026-03-12
 # Description: Ferroptosis and Immunotherapy Response Related Genes
 
-## 1. Ferroptosis Driver Genes (促进铁死亡)
+## Ferroptosis Driver Genes
 ACSL4
 LPCAT3
 ALOX15
@@ -13,7 +13,7 @@ P53
 SAT1
 CARS1
 
-## 2. Ferroptosis Suppressor Genes (抑制铁死亡)
+## Ferroptosis Suppressor Genes
 GPX4
 SLC7A11
 SLC3A2
@@ -29,12 +29,12 @@ MT1G
 MT1H
 MT1M
 
-## 3. Ferroptosis Marker Genes (标志物)
+## Ferroptosis Marker Genes
 PTGS2
 CHAC1
 ACSL4
 
-## 4. Antigen Presentation Genes - 抗原呈递
+## Antigen Presentation Genes
 HLA-A
 HLA-B
 HLA-C
@@ -49,7 +49,7 @@ B2M
 TAP1
 TAP2
 
-## 5. T Cell Infiltration Markers - T细胞浸润
+## T Cell Infiltration Markers
 CD3D
 CD3E
 CD4
@@ -65,7 +65,7 @@ GZMA
 GZMB
 PRF1
 
-## 6. Immune Checkpoint Genes - 免疫检查点
+## Immune Checkpoint Genes
 PDCD1
 CD274
 PDCD1LG2
@@ -75,7 +75,7 @@ LAG3
 TIGIT
 CD276
 
-## 7. Tumor Microenvironment - 肿瘤微环境
+## Tumor Microenvironment
 TGFB1
 TGFBR1
 TGFBR2
@@ -87,13 +87,10 @@ COL3A1
 ACTA2
 FAP
 
-## 8. Inflammatory Cytokines - 炎症因子
+## Inflammatory Cytokines
 IFNG
 IL2
 IL6
 IL10
 IL12A
 TNF
-
-## Total Genes: ~85 genes
-## Note: Need to remove duplicates and validate in expression data
